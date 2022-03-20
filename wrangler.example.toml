@@ -1,0 +1,16 @@
+name = "unirep-window"
+type = "javascript"
+account_id = ""
+workers_dev = true
+zone_id = ""
+compatibility_date = "2022-02-16"
+
+[site]
+bucket = "build"
+entry-point = "dist"
+
+[build]
+command = "npm run build:worker && echo '{\"name\": \"unirep-window\",\"main\":\"index.js\"}' > dist/package.json"
+
+[build.upload]
+format = "service-worker"

@@ -1,0 +1,27 @@
+.event-cell-outer {
+  border: 1px solid var(--color-black);
+  padding: 4px;
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.event-cell-outer.dark {
+  border: 1px solid var(--color-white);
+}
+
+.data-container {
+  color: var(--color-gray-8);
+  background-color: var(--color-gray-2);
+  border-radius: 8px;
+  padding: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-container.dark {
+  color: var(--color-gray-2);
+  background-color: var(--color-gray-8);
+}
