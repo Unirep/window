@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx'
 
 export class Events {
   logs = []
+  logsByTxHash = []
 
   constructor() {
     makeAutoObservable(this)
@@ -12,11 +13,21 @@ export class Events {
   }
 
   async load() {
-    this.logs = window.__EVENT_LOGS__ || []
+    this.setLogs(window.__EVENT_LOGS__ || [])
     if (this.logs.length > 0) return
     // otherwise load the events from the server
     const data = await fetch('/events').then(r => r.json())
-    this.logs = data
+    this.setLogs(data)
+  }
+
+  setLogs(logs) {
+    this.logs = logs
+    this.logsByTxHash = logs.reduce((acc, val) => {
+      return {
+        ...acc,
+        [val.transactionHash]: [...(acc[val.transactionHash] ?? []), val]
+      }
+    }, {})
   }
 }
 

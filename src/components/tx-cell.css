@@ -1,0 +1,13 @@
+.tx-cell-outer {
+  border-radius: 8px;
+  border: 1px solid var(--color-gray-2);
+  padding: 4px;
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tx-cell-outer.dark {
+  border: 1px solid var(--color-gray-6);
+}

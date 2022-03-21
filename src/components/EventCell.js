@@ -207,13 +207,8 @@ export default observer(({
   const ui = React.useContext(UIContext)
   return (
     <div className={`event-cell-outer ${ui.modeCssClass}`}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <div className="header6">{event.name}</div>
-        <div>Block {+event.blockNumber}</div>
-      </div>
-      <Spacer />
       <div style={{ display: 'flex' }}>
-        <div style={{ fontSize: '20px' }}>{descriptions[event.name]}</div>
+        <div style={{ fontSize: '20px' }}><span style={{ fontWeight: 'bold' }}>{event.name}</span>: {descriptions[event.name]}</div>
       </div>
       <Spacer />
       <div className={`data-container ${ui.modeCssClass}`} style={{ display: 'flex', flexDirection: 'column' }}>

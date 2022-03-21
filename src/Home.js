@@ -9,7 +9,7 @@ import Checkbox from 'nanoether/Checkbox'
 import UIContext from 'nanoether/interface'
 import Textfield from 'nanoether/Textfield'
 
-import EventCell from './components/EventCell'
+import TxCell from './components/TxCell'
 import EventContext from './contexts/events'
 
 const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
@@ -75,9 +75,9 @@ export default observer(() => {
         }
       </div>
       <div className="section-components">
-        {events.logs
-          .filter(l => showingLogs[l.name])
-          .map((l) => <EventCell event={l} />)}
+        {Object.entries(events.logsByTxHash)
+          .map(([hash, logs]) => [hash, logs.filter(l => showingLogs[l.name])])
+          .map(([hash, logs]) => <TxCell hash={hash} events={logs} />)}
       </div>
     </div>
   )
