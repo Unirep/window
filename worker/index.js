@@ -4,6 +4,7 @@ import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import Home from '../src/Home'
 import UIContext, { Interface } from 'nanoether/interface'
+import EventContext, { Events } from '../src/contexts/events'
 
 const OPTIMISM_NODE = 'https://opt-kovan.g.alchemy.com/v2/b5eaS0X3OMk54IppGh9ApffGoIOLIHOU'
 const GOERLI_NODE = 'https://goerli.infura.io/v3/5b122dbc87ed4260bf9a2031e8a0e2aa'
@@ -12,6 +13,13 @@ const GOERLI_NODE = 'https://goerli.infura.io/v3/5b122dbc87ed4260bf9a2031e8a0e2a
 const DEBUG = false
 const ENABLE_ASSET_CACHE = true
 const ENABLE_SSR_CACHE = false // TODO: cache bust after deployment
+
+addEventListener('scheduled', (event) => {
+  event.waitUntil((async () => {
+    const data = await loadLogs()
+    await UNIREP_DATA.put('latest', JSON.stringify(data))
+  })())
+})
 
 addEventListener('fetch', (event) => {
   event.respondWith(generateResponse(event))
@@ -29,7 +37,10 @@ async function generateResponse(event) {
     if (response) return response
   }
   if (/\/events$/.test(event.request.url)) {
-    return loadLogs(event)
+    const data = await loadLogs(event)
+    const response = new Response(JSON.stringify(data))
+    response.headers.set('content-type', 'application/json')
+    return response
   }
   return isSSR ? ssr(event) : staticAsset(event)
 }
@@ -42,14 +53,28 @@ async function ssr(event) {
       // render in darkmode
       iface.setDarkmode(true)
     }
+    const events = new Events()
+    const fullLogs = JSON.parse(await UNIREP_DATA.get('latest'))
+    events.logs = fullLogs.slice(0, 20)
     const app = ReactDOMServer.renderToString(
       <UIContext.Provider value={iface}>
-        <Home />
+        <EventContext.Provider value={events}>
+          <Home />
+        </EventContext.Provider>
       </UIContext.Provider>
     )
     // use npm run
     const finalIndex = html
-      .replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+      .replace(
+        '<div id="root"></div>',
+        `<div id="root">
+          <script>
+            // store hydration, find a more general way to do this?
+            window.__EVENT_LOGS__ = JSON.parse('${JSON.stringify(fullLogs)}');
+          </script>
+          ${app}
+        </div>`
+      )
     const response = new Response(finalIndex)
     response.headers.set('content-type', 'text/html')
     response.headers.set('Cache-Control', 'max-age=604800,s-maxage=604800,public')
@@ -97,8 +122,43 @@ async function staticAsset(event) {
   return response
 }
 
-async function loadLogs() {
-  // load unirep logs
+async function loadSocialLogs() {
+  const UNIREP_SOCIAL = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0'
+  const filters = {
+    SocialUserSignedUp: '0xe43c2a2d0ba801f72bfb7df8c728919e1886a4d9a6a12d45eeee7417bae2f155',
+    PostSubmitted: '0x6da51c4a7f6055cf90f927a5dd196677509f6bff613f1087859c131e54d45ba8',
+    CommentSubmitted: '0x49b90d3022da381379a9322dd5c48fb3b2dabc811dd97afd94e8e0c3625093b9',
+    VoteSubmitted: '0x203d880d1533b25a9d06611aae6dec1a560907b90df8479cdab40e445188bce4',
+    AirdropSubmitted: '0xcdc7a13869e4f8a627dbe2aaaf80ccb2acf27bea2ab437cd6de6d6789d1697bb'
+  }
+  const topics = [Object.keys(filters).reduce((acc, key) => {
+    acc.push(filters[key])
+    return acc
+  }, [])]
+  const filterNamesByHash = Object.keys(filters).reduce((acc, key) => {
+    return {
+      [filters[key]]: key,
+      ...acc,
+    }
+  }, {})
+
+  const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
+    fromBlock: 'earliest',
+    toBlock: 'latest',
+    address: UNIREP_SOCIAL,
+    topics,
+  }))
+    .map(d => {
+      // now add a human readable event name where possible
+      return {
+        name: filterNamesByHash[d.topics[0]],
+        ...d,
+      }
+    })
+  return data
+}
+
+async function loadUnirepLogs() {
   const UNIREP = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6'
   const filters = {
     UserSignedUp: '0xaf92f92b28945d280b51131bc986d2da66b560950f1a5126f12b7f847dae8f7d',
@@ -122,8 +182,6 @@ async function loadLogs() {
       ...acc,
     }
   }, {})
-  // const blockNumber = await ethRequest(OPTIMISM_NODE, 'eth_blockNumber')
-  // console.log(blockNumber)
 
   const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
@@ -138,9 +196,24 @@ async function loadLogs() {
         ...d,
       }
     })
-  const response = new Response(JSON.stringify(data))
-  response.headers.set('content-type', 'application/json')
-  return response
+
+  return data
+}
+
+async function loadLogs() {
+  const [unirepLogs, socialLogs] = await Promise.all([
+    loadUnirepLogs(),
+    loadSocialLogs(),
+  ])
+  return [unirepLogs, socialLogs].flat().sort((a, b) => {
+    if (+a.blockNumber !== +b.blockNumber) {
+        return +a.blockNumber - +b.blockNumber
+    }
+    if (+a.transactionIndex !== +b.transactionIndex) {
+        return +a.transactionIndex - +b.transactionIndex
+    }
+    return +a.logIndex - +b.logIndex
+  })
 }
 
 async function ethRequest(node, method, ...args) {

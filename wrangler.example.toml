@@ -5,6 +5,10 @@ workers_dev = true
 zone_id = ""
 compatibility_date = "2022-02-16"
 
+kv_namespaces = [
+  { binding = "UNIREP_DATA", id = "ff4ba4b18aa74bceb04d5a02e575c19b" }
+]
+
 [site]
 bucket = "build"
 entry-point = "dist"

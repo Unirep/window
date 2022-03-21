@@ -15,20 +15,25 @@ const descriptions = {
   IndexedUserSignedUpProof: 'A ZK proof that a user controlling a semaphore identity would like to register in the state tree.',
   IndexedStartedTransitionProof: 'A ZK proof that a user would like to begin a state transition.',
   IndexedProcessedAttestationsProof: 'A ZK proof allowing the attester to blind and process state changes for a user.',
-  IndexedUserStateTransitionProof: 'A ZK proof showing the state change has been completed. Includes new epoch keys.'
+  IndexedUserStateTransitionProof: 'A ZK proof showing the state change has been completed. Includes new epoch keys.',
+  SocialUserSignedUp: '',
+  PostSubmitted: 'A user is creating a post.',
+  CommentSubmitted: 'A user is commenting on a post.',
+  VoteSubmitted: 'A user is voting on a post or comment.',
+  AirdropSubmitted: 'A user is requesting an airdrop.'
 }
 
 const parseData = {
   UserSignedUp: (event) => ({
     epoch: +event.topics[1],
     identity: event.topics[2],
-    attesterId: +event.topics[3],
-    airdropAmount: +event.topics[4],
+    // attesterId: +event.topics[3],
+    // airdropAmount: +event.topics[4],
   }),
   UserStateTransitioned: (event) => ({
     epoch: +event.topics[1],
     hashedLeaf: event.topics[2],
-    proofIndex: +event.topics[3]
+    // proofIndex: +event.topics[3]
   }),
   AttestationSubmitted: (event) => ({
     epoch: +event.topics[1],
@@ -65,6 +70,32 @@ const parseData = {
   IndexedUserStateTransitionProof: (event) => ({
     proofIndex: +event.topics[1],
     // TODO: decode proof
+  }),
+  SocialUserSignedUp: (event) => ({
+    epoch: +event.topics[1],
+  }),
+  PostSubmitted: (event) => ({
+    epoch: +event.topics[1],
+    epochKey: event.topics[2].slice(-8),
+    postContent: event.topics[3],
+  }),
+  CommentSubmitted: (event) => ({
+    epoch: +event.topics[1],
+    postId: event.topics[2],
+    epochKey: event.topics[3].slice(-8),
+    commentContent: event.topics[4],
+  }),
+  VoteSubmitted: (event) => ({
+    epoch: +event.topics[1],
+    fromEpochKey: event.topics[2].slice(-8),
+    toEpochKey: event.topics[3].slice(-8),
+    upvoteValue: +event.topics[4],
+    downvoteValue: +event.topics[5],
+    toEpochKeyProofIndex: +event.topics[6],
+  }),
+  AirdropSubmitted: (event) => ({
+    epoch: +event.topics[1],
+    epochKey: event.topics[2].slice(-8),
   })
 }
 

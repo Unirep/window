@@ -10,6 +10,7 @@ import UIContext from 'nanoether/interface'
 import Textfield from 'nanoether/Textfield'
 
 import EventCell from './components/EventCell'
+import EventContext from './contexts/events'
 
 const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
 const eventNames = [
@@ -23,25 +24,25 @@ const eventNames = [
   'IndexedStartedTransitionProof',
   'IndexedProcessedAttestationsProof',
   'IndexedUserStateTransitionProof',
+  'SocialUserSignedUp',
+  'PostSubmitted',
+  'CommentSubmitted',
+  'VoteSubmitted',
+  'AirdropSubmitted'
 ]
 
 export default observer(() => {
   const ui = React.useContext(UIContext)
-  const [logs, setLogs] = React.useState([])
+  const events = React.useContext(EventContext)
   const [showingLogs, setShowingLogs] = React.useState(eventNames.reduce((acc, name) => ({
     [name]: true,
     ...acc,
   }), {}))
-  React.useEffect(() => {
-    fetch('/events')
-      .then(r => r.json())
-      .then(setLogs)
-  }, [])
   return (
     <div className={`container ${ui.modeCssClass}`}>
       <div className={`header ${ui.modeCssClass}`}>
         <div className="header5">
-          Unirep Op Window
+          Unirep Window
         </div>
       </div>
       <div style={{display: 'flex', justifyContent: 'center', margin: '8px'}}>
@@ -55,14 +56,14 @@ export default observer(() => {
       </div>
       <div style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        maxHeight: `${80*(eventNames.length/Math.ceil(ui.screenWidth/330))}px`,
-        flexWrap: 'wrap'
+        justifyContent: 'space-around',
+        flexWrap: 'wrap',
+        maxWidth: '1050px',
+        alignSelf: 'center'
       }}>
         {
           eventNames.map((n) => (
-            <div style={{ display: 'flex', alignItems: 'center', width: '330px'}}>
+            <div style={{ display: 'flex', alignItems: 'center', width: '350px'}}>
               <Checkbox
                 onChange={(enabled) => setShowingLogs({ ...showingLogs, [n]: enabled })}
                 checked={showingLogs[n]}
@@ -74,7 +75,7 @@ export default observer(() => {
         }
       </div>
       <div className="section-components">
-        {logs
+        {events.logs
           .filter(l => showingLogs[l.name])
           .map((l) => <EventCell event={l} />)}
       </div>
