@@ -38,6 +38,7 @@ export default observer(() => {
     [name]: true,
     ...acc,
   }), {}))
+  const [showingAll, setShowingAll] = React.useState(true)
   return (
     <div className={`container ${ui.modeCssClass}`}>
       <div className={`header ${ui.modeCssClass}`}>
@@ -61,11 +62,22 @@ export default observer(() => {
         maxWidth: '1050px',
         alignSelf: 'center'
       }}>
+        <div style={{ display: 'flex', alignItems: 'center', width: '350px'}}>
+          <Checkbox
+            onChange={(enabled) => setShowingAll(enabled) || setShowingLogs(eventNames.reduce((acc, name) => ({
+              [name]: enabled,
+              ...acc,
+            }), {}))}
+            checked={showingAll}
+          />
+          <div>All</div>
+          <Spacer />
+        </div>
         {
           eventNames.map((n) => (
             <div style={{ display: 'flex', alignItems: 'center', width: '350px'}}>
               <Checkbox
-                onChange={(enabled) => setShowingLogs({ ...showingLogs, [n]: enabled })}
+                onChange={(enabled) => setShowingLogs((prev) => ({ ...prev, [n]: enabled }))}
                 checked={showingLogs[n]}
               />
               <div>{n}</div>
@@ -77,6 +89,7 @@ export default observer(() => {
       <div className="section-components">
         {Object.entries(events.logsByTxHash)
           .map(([hash, logs]) => [hash, logs.filter(l => showingLogs[l.name])])
+          .filter(([hash, logs]) => logs.length > 0)
           .map(([hash, logs]) => <TxCell hash={hash} events={logs} />)}
       </div>
     </div>
