@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import './event-cell.css'
 import UIContext from 'nanoether/interface'
+import { ethers } from 'ethers'
 
 const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
 
@@ -24,23 +25,57 @@ const descriptions = {
 }
 
 const parseData = {
-  UserSignedUp: (event) => ({
-    epoch: +event.topics[1],
-    identity: event.topics[2],
-    // attesterId: +event.topics[3],
-    // airdropAmount: +event.topics[4],
-  }),
+  UserSignedUp: (event) => {
+    const [attesterId, airdropAmount] = ethers.utils.defaultAbiCoder.decode(
+      ['uint', 'uint'],
+      event.data
+    )
+    return {
+      epoch: +event.topics[1],
+      identity: event.topics[2],
+      attesterId: attesterId.toString(),
+      airdropAmount: airdropAmount.toString(),
+    }
+  },
   UserStateTransitioned: (event) => ({
     epoch: +event.topics[1],
     hashedLeaf: event.topics[2],
     // proofIndex: +event.topics[3]
   }),
-  AttestationSubmitted: (event) => ({
-    epoch: +event.topics[1],
-    epochKey: event.topics[2].slice(-8),
-    attester: '0x' + event.topics[3].slice(-40),
-    // TODO
-  }),
+  AttestationSubmitted: (event) => {
+    const [
+      eventType,
+      [
+        attesterId,
+        positiveRep,
+        negativeRep,
+        graffiti,
+        signUp,
+      ],
+      toProofIndex,
+      fromProofIndex
+    ] = ethers.utils.defaultAbiCoder.decode(
+      ['uint', 'tuple(uint, uint, uint, uint, uint)', 'uint', 'uint'],
+      event.data
+    )
+    const eventTypes = [
+      'SendAttestation',
+      'Airdrop',
+      'SpendReputation',
+    ]
+    return {
+      epoch: +event.topics[1],
+      epochKey: event.topics[2].slice(-8),
+      attesterId: +attesterId.toString(),
+      eventType: eventTypes[+eventType.toString()],
+      positiveRep: positiveRep.toString(),
+      negativeRep: negativeRep.toString(),
+      graffiti: graffiti.toString(),
+      signUp: signUp.toString(),
+      toProofIndex: toProofIndex.toString(),
+      fromProofIndex: fromProofIndex.toString(),
+    }
+  },
   EpochEnded: (event) => ({
     epoch: +event.topics[1],
   }),
@@ -74,25 +109,92 @@ const parseData = {
   SocialUserSignedUp: (event) => ({
     epoch: +event.topics[1],
   }),
-  PostSubmitted: (event) => ({
-    epoch: +event.topics[1],
-    epochKey: event.topics[2].slice(-8),
-    postContent: event.topics[3],
-  }),
-  CommentSubmitted: (event) => ({
-    epoch: +event.topics[1],
-    postId: event.topics[2],
-    epochKey: event.topics[3].slice(-8),
-    commentContent: event.topics[4],
-  }),
-  VoteSubmitted: (event) => ({
-    epoch: +event.topics[1],
-    fromEpochKey: event.topics[2].slice(-8),
-    toEpochKey: event.topics[3].slice(-8),
-    upvoteValue: +event.topics[4],
-    downvoteValue: +event.topics[5],
-    toEpochKeyProofIndex: +event.topics[6],
-  }),
+  PostSubmitted: (event) => {
+    const [
+      postContent,
+      [
+        nullifiers,
+        epoch,
+        epochKey,
+        gst,
+        attesterId,
+        proveReputationAmount,
+        minRep,
+        proveGraffiti,
+        graffitiPreImage,
+        proof,
+      ]
+    ] = ethers.utils.defaultAbiCoder.decode(
+      ['string', 'tuple(uint[], uint, uint, uint, uint, uint, uint, uint, uint, uint[8])'],
+      event.data
+    )
+    return {
+      epoch: +event.topics[1],
+      epochKey: event.topics[2].slice(-8),
+      postContent,
+      proveReputationAmount: proveReputationAmount.toString(),
+      minRep: minRep.toString(),
+    }
+  },
+  CommentSubmitted: (event) => {
+    const [
+      commentContent,
+      [
+        nullifiers,
+        epoch,
+        epochKey,
+        gst,
+        attesterId,
+        proveReputationAmount,
+        minRep,
+        proveGraffiti,
+        graffitiPreImage,
+        proof,
+      ]
+    ] = ethers.utils.defaultAbiCoder.decode(
+      ['string', 'tuple(uint[], uint, uint, uint, uint, uint, uint, uint, uint, uint[8])'],
+      event.data
+    )
+    return {
+      epoch: +event.topics[1],
+      postId: event.topics[2],
+      epochKey: event.topics[3].slice(-8),
+      commentContent,
+      proveReputationAmount: proveReputationAmount.toString(),
+      minRep: minRep.toString(),
+    }
+  },
+  VoteSubmitted: (event) => {
+    const [
+      upvoteValue,
+      downvoteValue,
+      toEpochKeyProofIndex,
+      [
+        nullifiers,
+        epoch,
+        epochKey,
+        gst,
+        attesterId,
+        proveReputationAmount,
+        minRep,
+        proveGraffiti,
+        graffitiPreImage,
+        proof,
+      ]
+    ] = ethers.utils.defaultAbiCoder.decode(
+      ['uint', 'uint', 'uint', 'tuple(uint[], uint, uint, uint, uint, uint, uint, uint, uint, uint[8])'],
+      event.data
+    )
+    return {
+      epoch: +event.topics[1],
+      fromEpochKey: event.topics[2].slice(-8),
+      toEpochKey: event.topics[3].slice(-8),
+      upvoteValue: upvoteValue.toString(),
+      downvoteValue: downvoteValue.toString(),
+      proveReputationAmount: proveReputationAmount.toString(),
+      minRep: minRep.toString(),
+    }
+  },
   AirdropSubmitted: (event) => ({
     epoch: +event.topics[1],
     epochKey: event.topics[2].slice(-8),
