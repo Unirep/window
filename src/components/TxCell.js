@@ -19,9 +19,9 @@ export default observer(({
           style={{ cursor: 'pointer' }}
           onClick={() => window.open(`https://kovan-optimistic.etherscan.io/tx/${hash}`, '_blank')}
         >
-          {hash.slice(0, 10)}{events.length > 1 ? ` - ${events.length} events` : ''}
+          {hash.slice(0, 15)}
         </div>
-        <div>Block {+events[0].blockNumber}</div>
+        <div>{events.length} event{events.length > 1 ? 's' : ''}</div>
       </div>
       {
         events.map((event) => (

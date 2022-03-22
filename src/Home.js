@@ -59,10 +59,10 @@ export default observer(() => {
         display: 'flex',
         justifyContent: 'space-around',
         flexWrap: 'wrap',
-        maxWidth: '1050px',
+        maxWidth: '960px',
         alignSelf: 'center'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', width: '350px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', width: '320px'}}>
           <Checkbox
             onChange={(enabled) => setShowingAll(enabled) || setShowingLogs(eventNames.reduce((acc, name) => ({
               [name]: enabled,
@@ -75,7 +75,7 @@ export default observer(() => {
         </div>
         {
           eventNames.map((n) => (
-            <div style={{ display: 'flex', alignItems: 'center', width: '350px'}}>
+            <div style={{ display: 'flex', alignItems: 'center', width: '320px'}}>
               <Checkbox
                 onChange={(enabled) => setShowingLogs((prev) => ({ ...prev, [n]: enabled }))}
                 checked={showingLogs[n]}
