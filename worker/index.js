@@ -55,7 +55,7 @@ async function ssr(event) {
     }
     const events = new Events()
     const fullLogs = JSON.parse(await UNIREP_DATA.get('latest'))
-    events.logs = fullLogs.slice(0, 20)
+    events.setLogs(fullLogs.slice(0, 20))
     const app = ReactDOMServer.renderToString(
       <UIContext.Provider value={iface}>
         <EventContext.Provider value={events}>
