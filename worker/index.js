@@ -36,7 +36,8 @@ async function generateResponse(event) {
     }
     if (response) return response
   }
-  if (/\/events$/.test(event.request.url)) {
+  const url = new URL(event.request.url)
+  if (url.pathname === '/events') {
     const data = await loadLogs(event)
     const response = new Response(JSON.stringify(data))
     response.headers.set('content-type', 'application/json')
@@ -53,8 +54,11 @@ async function ssr(event) {
       // render in darkmode
       iface.setDarkmode(true)
     }
+    const url = new URL(event.request.url)
+    const fullLogs = url.searchParams.has('unirep') ?
+      (await loadLogs(event)) :
+      JSON.parse(await UNIREP_DATA.get('latest'))
     const events = new Events()
-    const fullLogs = JSON.parse(await UNIREP_DATA.get('latest'))
     events.setLogs(fullLogs.slice(0, 20))
     const app = ReactDOMServer.renderToString(
       <UIContext.Provider value={iface}>
@@ -122,8 +126,7 @@ async function staticAsset(event) {
   return response
 }
 
-async function loadSocialLogs() {
-  const UNIREP_SOCIAL = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0'
+async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0') {
   const filters = {
     SocialUserSignedUp: '0xe43c2a2d0ba801f72bfb7df8c728919e1886a4d9a6a12d45eeee7417bae2f155',
     PostSubmitted: '0x6da51c4a7f6055cf90f927a5dd196677509f6bff613f1087859c131e54d45ba8',
@@ -145,7 +148,7 @@ async function loadSocialLogs() {
   const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
-    address: UNIREP_SOCIAL,
+    address: unirepSocial,
     topics,
   }))
     .map(d => {
@@ -158,8 +161,7 @@ async function loadSocialLogs() {
   return data
 }
 
-async function loadUnirepLogs() {
-  const UNIREP = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6'
+async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6') {
   const filters = {
     UserSignedUp: '0xaf92f92b28945d280b51131bc986d2da66b560950f1a5126f12b7f847dae8f7d',
     UserStateTransitioned: '0x5e4945fc83b420d245560b51ac02c824732652e0552b5d8537800db0c690a663',
@@ -186,7 +188,7 @@ async function loadUnirepLogs() {
   const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
-    address: UNIREP,
+    address: unirep,
     topics,
   }))
     .map(d => {
@@ -200,10 +202,11 @@ async function loadUnirepLogs() {
   return data
 }
 
-async function loadLogs() {
+async function loadLogs(event) {
+  const url = new URL(event.request.url)
   const [unirepLogs, socialLogs] = await Promise.all([
-    loadUnirepLogs(),
-    loadSocialLogs(),
+    loadUnirepLogs(url.searchParams.get('unirep')),
+    loadSocialLogs(url.searchParams.get('unirepSocial')),
   ])
   return [unirepLogs, socialLogs].flat().sort((a, b) => {
     if (+a.blockNumber !== +b.blockNumber) {
