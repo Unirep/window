@@ -126,7 +126,7 @@ async function staticAsset(event) {
   return response
 }
 
-async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0') {
+async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0', goerli = false) {
   const filters = {
     SocialUserSignedUp: '0xe43c2a2d0ba801f72bfb7df8c728919e1886a4d9a6a12d45eeee7417bae2f155',
     PostSubmitted: '0x6da51c4a7f6055cf90f927a5dd196677509f6bff613f1087859c131e54d45ba8',
@@ -145,7 +145,7 @@ async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb5994
     }
   }, {})
 
-  const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
+  const data = (await ethRequest(goerli ? GOERLI_NODE : OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
     address: unirepSocial,
@@ -155,13 +155,14 @@ async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb5994
       // now add a human readable event name where possible
       return {
         name: filterNamesByHash[d.topics[0]],
+        goerli,
         ...d,
       }
     })
   return data
 }
 
-async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6') {
+async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6', goerli = false) {
   const filters = {
     UserSignedUp: '0xaf92f92b28945d280b51131bc986d2da66b560950f1a5126f12b7f847dae8f7d',
     UserStateTransitioned: '0x5e4945fc83b420d245560b51ac02c824732652e0552b5d8537800db0c690a663',
@@ -185,7 +186,7 @@ async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141
     }
   }, {})
 
-  const data = (await ethRequest(OPTIMISM_NODE, 'eth_getLogs', {
+  const data = (await ethRequest(goerli ? GOERLI_NODE : OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
     address: unirep,
@@ -195,6 +196,7 @@ async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141
       // now add a human readable event name where possible
       return {
         name: filterNamesByHash[d.topics[0]],
+        goerli,
         ...d,
       }
     })
@@ -205,8 +207,8 @@ async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141
 async function loadLogs(event) {
   const url = new URL(event.request.url)
   const [unirepLogs, socialLogs] = await Promise.all([
-    loadUnirepLogs(url.searchParams.get('unirep')),
-    loadSocialLogs(url.searchParams.get('unirepSocial')),
+    loadUnirepLogs(url.searchParams.get('unirep'), url.searchParams.has('goerli')),
+    loadSocialLogs(url.searchParams.get('unirepSocial'), url.searchParams.has('goerli')),
   ])
   return [unirepLogs, socialLogs].flat().sort((a, b) => {
     if (+a.blockNumber !== +b.blockNumber) {

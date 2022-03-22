@@ -17,7 +17,7 @@ export default observer(({
         <div
           className="header6"
           style={{ cursor: 'pointer' }}
-          onClick={() => window.open(`https://kovan-optimistic.etherscan.io/tx/${hash}`, '_blank')}
+          onClick={() => window.open(`https://${events[0].goerli ? 'goerli' : 'kovan-optimistic'}.etherscan.io/tx/${hash}`, '_blank')}
         >
           {hash.slice(0, 15)}
         </div>
