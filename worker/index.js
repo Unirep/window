@@ -16,7 +16,7 @@ const ENABLE_SSR_CACHE = false // TODO: cache bust after deployment
 
 addEventListener('scheduled', (event) => {
   event.waitUntil((async () => {
-    const data = await loadLogs()
+    const data = await loadLogs(event)
     await UNIREP_DATA.put('latest', JSON.stringify(data))
   })())
 })
@@ -42,6 +42,10 @@ async function generateResponse(event) {
     const response = new Response(JSON.stringify(data))
     response.headers.set('content-type', 'application/json')
     return response
+  } else if (url.pathname === '/update') {
+    const data = await loadLogs(event)
+    await UNIREP_DATA.put('latest', JSON.stringify(data))
+    return new Response()
   }
   return isSSR ? ssr(event) : staticAsset(event)
 }
@@ -126,7 +130,7 @@ async function staticAsset(event) {
   return response
 }
 
-async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb599459A7Ecc0', goerli = false) {
+async function loadSocialLogs(unirepSocial, goerli = false) {
   const filters = {
     SocialUserSignedUp: '0xe43c2a2d0ba801f72bfb7df8c728919e1886a4d9a6a12d45eeee7417bae2f155',
     PostSubmitted: '0x6da51c4a7f6055cf90f927a5dd196677509f6bff613f1087859c131e54d45ba8',
@@ -148,7 +152,7 @@ async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb5994
   const data = (await ethRequest(goerli ? GOERLI_NODE : OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
-    address: unirepSocial,
+    address: unirepSocial || '0x27b755D88cD87D3e27AaA45880224DDD23c736D7',
     topics,
   }))
     .map(d => {
@@ -162,7 +166,7 @@ async function loadSocialLogs(unirepSocial = '0xb1F6ded0a1C0dCE4e99A17Ed7cbb5994
   return data
 }
 
-async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141f6', goerli = false) {
+async function loadUnirepLogs(unirep, goerli = false) {
   const filters = {
     UserSignedUp: '0xaf92f92b28945d280b51131bc986d2da66b560950f1a5126f12b7f847dae8f7d',
     UserStateTransitioned: '0x5e4945fc83b420d245560b51ac02c824732652e0552b5d8537800db0c690a663',
@@ -189,7 +193,7 @@ async function loadUnirepLogs(unirep = '0xfddf504e7b74d982e91ed3a70cdbd58c52a141
   const data = (await ethRequest(goerli ? GOERLI_NODE : OPTIMISM_NODE, 'eth_getLogs', {
     fromBlock: 'earliest',
     toBlock: 'latest',
-    address: unirep,
+    address: unirep || '0xC7017d671aA741e8AbD5F5Fc8588039c5F739Bb3',
     topics,
   }))
     .map(d => {

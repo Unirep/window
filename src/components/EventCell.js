@@ -65,7 +65,7 @@ const parseData = {
     ]
     return {
       epoch: +event.topics[1],
-      epochKey: event.topics[2].slice(-8),
+      epochKey: event.topics[2].slice(-16),
       attesterId: +attesterId.toString(),
       eventType: eventTypes[+eventType.toString()],
       positiveRep: positiveRep.toString(),
@@ -82,18 +82,18 @@ const parseData = {
   IndexedEpochKeyProof: (event) => ({
     proofIndex: +event.topics[1],
     epoch: +event.topics[2],
-    epochKey: event.topics[3].slice(-8),
+    epochKey: event.topics[3].slice(-16),
   }),
   IndexedReputationProof: (event) => ({
     proofIndex: +event.topics[1],
     epoch: +event.topics[2],
-    epochKey: event.topics[3].slice(-8),
+    epochKey: event.topics[3].slice(-16),
     // TODO: decode proof
   }),
   IndexedUserSignedUpProof: (event) => ({
     proofIndex: +event.topics[1],
     epoch: +event.topics[2],
-    epochKey: event.topics[3].slice(-8),
+    epochKey: event.topics[3].slice(-16),
     // TODO: decode proof
   }),
   IndexedStartedTransitionProof: (event) => ({
@@ -130,7 +130,7 @@ const parseData = {
     )
     return {
       epoch: +event.topics[1],
-      epochKey: event.topics[2].slice(-8),
+      epochKey: event.topics[2].slice(-16),
       postContent,
       proveReputationAmount: proveReputationAmount.toString(),
       minRep: minRep.toString(),
@@ -158,7 +158,7 @@ const parseData = {
     return {
       epoch: +event.topics[1],
       postId: event.topics[2],
-      epochKey: event.topics[3].slice(-8),
+      epochKey: event.topics[3].slice(-16),
       commentContent,
       proveReputationAmount: proveReputationAmount.toString(),
       minRep: minRep.toString(),
@@ -187,8 +187,8 @@ const parseData = {
     )
     return {
       epoch: +event.topics[1],
-      fromEpochKey: event.topics[2].slice(-8),
-      toEpochKey: event.topics[3].slice(-8),
+      fromEpochKey: event.topics[2].slice(-16),
+      toEpochKey: event.topics[3].slice(-16),
       upvoteValue: upvoteValue.toString(),
       downvoteValue: downvoteValue.toString(),
       proveReputationAmount: proveReputationAmount.toString(),
@@ -197,7 +197,7 @@ const parseData = {
   },
   AirdropSubmitted: (event) => ({
     epoch: +event.topics[1],
-    epochKey: event.topics[2].slice(-8),
+    epochKey: event.topics[2].slice(-16),
   })
 }
 
