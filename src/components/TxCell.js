@@ -22,10 +22,13 @@ export default observer(({
           <div>Events <span style={{ fontWeight: '600' }}>{events.length}</span></div>
         </div>
         <div
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
           onClick={() => window.open(`https://${events[0].goerli ? 'goerli' : 'kovan-optimistic'}.etherscan.io/tx/${hash}`, '_blank')}
         >
-        Etherscan</div>
+          <div style={{ fontSize: '12px' }}>Etherscan</div>
+          <Spacer />
+          <img src={require('../../assets/open.svg')} />
+        </div>
       </div>
       <div
         style={{

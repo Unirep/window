@@ -39,6 +39,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 1440px;
+  padding: 0px 32px;
+  margin: auto;
+  color: #464748;
 }
 
 .container.dark {

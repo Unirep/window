@@ -11,81 +11,32 @@ import Textfield from 'nanoether/Textfield'
 
 import TxCell from './components/TxCell'
 import EventContext from './contexts/events'
+import FilterBox from './components/FilterBox'
 
 const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
-const eventNames = [
-  'UserSignedUp',
-  'UserStateTransitioned',
-  'AttestationSubmitted',
-  'EpochEnded',
-  'IndexedEpochKeyProof',
-  'IndexedReputationProof',
-  'IndexedUserSignedUpProof',
-  'IndexedStartedTransitionProof',
-  'IndexedProcessedAttestationsProof',
-  'IndexedUserStateTransitionProof',
-  'SocialUserSignedUp',
-  'PostSubmitted',
-  'CommentSubmitted',
-  'VoteSubmitted',
-  'AirdropSubmitted'
-]
 
 export default observer(() => {
   const ui = React.useContext(UIContext)
   const events = React.useContext(EventContext)
-  const [showingLogs, setShowingLogs] = React.useState(eventNames.reduce((acc, name) => ({
-    [name]: true,
-    ...acc,
-  }), {}))
-  const [showingAll, setShowingAll] = React.useState(true)
+  const [showingLogs, setShowingLogs] = React.useState({})
   return (
     <div className={`container ${ui.modeCssClass}`}>
       <div className={`header ${ui.modeCssClass}`}>
-        <div className="header5">
-          Unirep Window
+        <img src={require('../assets/logo.svg')} />
+        <div className="app-button" onClick={() => window.open('https://unirep.social')}>
+          <div className="app-button-text">App →</div>
         </div>
       </div>
-      <div style={{display: 'flex', justifyContent: 'center', margin: '8px'}}>
-        <div className={`section-box ${ui.modeCssClass}`}>
-          <div>A look at the events in the Unirep system.</div>
-          <div style={{ width: '8px' }} />
-          <Button size="xsmall" onClick={() => ui.setDarkmode(!ui.darkmode)}>
-            {ui.darkmode ? 'Light' : 'Dark'}
-          </Button>
-        </div>
+      <div style={{ height: '48px' }} />
+      <div style={{ color: '#070707', fontSize: '32px', fontWeight: '600' }}>
+        Attester ID 1
       </div>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        maxWidth: '960px',
-        alignSelf: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', width: '320px'}}>
-          <Checkbox
-            onChange={(enabled) => setShowingAll(enabled) || setShowingLogs(eventNames.reduce((acc, name) => ({
-              [name]: enabled,
-              ...acc,
-            }), {}))}
-            checked={showingAll}
-          />
-          <div>All</div>
-          <Spacer />
-        </div>
-        {
-          eventNames.map((n) => (
-            <div style={{ display: 'flex', alignItems: 'center', width: '320px'}}>
-              <Checkbox
-                onChange={(enabled) => setShowingLogs((prev) => ({ ...prev, [n]: enabled }))}
-                checked={showingLogs[n]}
-              />
-              <div>{n}</div>
-              <Spacer />
-            </div>
-          ))
-        }
+      <Spacer />
+      <div style={{ color: '#070707', fontSize: '24px', fontWeight: '600' }}>
+        A look at the events in the UniRep system
       </div>
+      <div style={{ height: '40px' }} />
+      <FilterBox updateVisibleLogs={(visible) => setShowingLogs(visible)} />
       <div className="section-components">
         {Object.entries(events.logsByTxHash)
           .map(([hash, logs]) => [hash, logs.filter(l => showingLogs[l.name])])

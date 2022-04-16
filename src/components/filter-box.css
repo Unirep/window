@@ -1,0 +1,24 @@
+.filter-box-outer {
+  border-radius: 8px;
+  border: 1px solid #DADDDE;
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.filter-gray-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  border-radius: 4px;
+  background: #F0F2F2;
+  flex: 1;
+  margin: 4px;
+  padding: 8px;
+}
+
+.filter-section-title {
+  color: #464748;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 4px;
+}

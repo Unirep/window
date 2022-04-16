@@ -3,7 +3,7 @@
   border: 8px solid var(--color-gray-1);
   box-sizing: border-box;
   padding: 32px;
-  margin: 16px 32px;
+  margin: 16px 0px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
