@@ -13,12 +13,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['*', '.js', '.jsx', '.json'],
-    // just for development, peer dependencies work when the module isn't linked
-    alias: {
-      react: require.resolve('react'),
-      mobx: require.resolve('mobx'),
-      'mobx-react-lite': require.resolve('mobx-react-lite'),
-    }
   },
   module: {
     rules: [

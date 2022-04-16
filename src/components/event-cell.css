@@ -12,3 +12,14 @@
   color: var(--color-gray-2);
   background-color: var(--color-gray-8);
 }
+
+.gray-box {
+  display: flex;
+  justify-content: space-around;
+  border-radius: 4px;
+  background: #F0F2F2;
+  flex: 1;
+  min-width: 100px;
+  margin: 0px 4px;
+  padding: 16px;
+}

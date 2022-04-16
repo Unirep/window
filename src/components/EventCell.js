@@ -4,7 +4,7 @@ import './event-cell.css'
 import UIContext from 'nanoether/interface'
 import { ethers } from 'ethers'
 
-const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
+const Spacer = (props) => <div style={{ width: '8px', height: '8px', ...(props.style ?? {}) }} />
 
 const descriptions = {
   UserSignedUp: 'Attester has registered a new semaphore identity commitment.',
@@ -203,25 +203,103 @@ const parseData = {
 
 export default observer(({
   event,
+  index,
 }) => {
   const ui = React.useContext(UIContext)
+  const data = parseData[event.name] && parseData[event.name](event) || {}
   return (
     <div className={`event-cell-outer ${ui.modeCssClass}`}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ fontSize: '20px' }}><span style={{ fontWeight: 'bold' }}>{event.name}</span>: {descriptions[event.name]}</div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#464748',
+          borderRadius: '24px',
+          border: '2.6px solid #464748',
+          width: '24px',
+          height: '24px',
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div>
+            {index + 1}
+          </div>
+        </div>
+        <Spacer />
+        <div style={{ fontSize: '24px', fontWeight: '600', color: '#464748' }}>
+          {event.name}
+        </div>
+      </div>
+      <Spacer style={{ height: '26px' }} />
+      <div style={{ borderRadius: '4px', background: '#F0F2F2', padding: '16px' }}>
+        {descriptions[event.name]}
       </div>
       <Spacer />
-      <div className={`data-container ${ui.modeCssClass}`} style={{ display: 'flex', flexDirection: 'column' }}>
-        {
-          Object.entries(parseData[event.name] && parseData[event.name](event) || {})
-            .map(([key, val]) => (
-              <div style={{ display: 'flex', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                <div>{key}:</div>
-                <Spacer />
-                <div style={{ textOverflow: 'ellipsis' }}>{val}</div>
-              </div>
-            ))
-        }
+      <div style={{ display: 'flex', flex: '1', flexWrap: 'wrap', margin: '0px -4px' }}>
+        <div className="gray-box">
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.eventType ? <div>Event Type</div> : null}
+            {data.postContent ? <div>Post Content</div> : null}
+            {data.postContent ? <div>{data.postContent}</div> : null}
+            {data.identity ? <div>Identity</div> : null}
+            {data.identity ? <div style={{ wordBreak: 'break-all' }}>{data.identity}</div> : null}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.eventType ? <div>{data.eventType}</div> : null}
+          </div>
+        </div>
+        <div className="gray-box">
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.epoch ? <div>Epoch</div> : null}
+            {data.epochKey ? <div>Epoch Key</div> : null}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.epoch ? <div>{data.epoch}</div> : null}
+            {data.epochKey ? <div>{data.epochKey}</div> : null}
+          </div>
+        </div>
+        <div className="gray-box">
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.proofIndex ? <div>Proof Index</div> : null}
+            {data.toProofIndex > 0 ? <div>To proof index</div> : null}
+            {data.fromProofIndex > 0 ? <div>From proof index</div> : null}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.proofIndex ? <div>{data.proofIndex}</div> : null}
+            {data.toProofIndex > 0 ? <div>{data.toProofIndex}</div> : null}
+            {data.fromProofIndex > 0 ? <div>{data.fromProofIndex}</div> : null}
+          </div>
+        </div>
+        <div className="gray-box">
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.positiveRep ? <div>Positive REP</div> : null}
+            {data.negativeRep ? <div>Negative REP</div> : null}
+            {data.upvoteValue ? <div>Up vote</div> : null}
+            {data.downvoteValue ? <div>Down vote</div> : null}
+            {data.proveReputationAmount ? <div>Prove REP</div> : null}
+            {data.minRep ? <div>Min REP</div> : null}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.positiveRep ? <div>{data.positiveRep}</div> : null}
+            {data.negativeRep ? <div>{data.negativeRep}</div> : null}
+            {data.upvoteValue ? <div>{data.upvoteValue}</div> : null}
+            {data.downvoteValue ? <div>{data.downvoteValue}</div> : null}
+            {data.proveReputationAmount ? <div>{data.proveReputationAmount}</div> : null}
+            {data.minRep ? <div>{data.minRep}</div> : null}
+          </div>
+        </div>
+        <div className="gray-box">
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.graffiti ? <div>Graffiti</div> : null}
+            {data.signUp ? <div>Sign up</div> : null}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column'}}>
+            {data.graffiti ? <div>{data.graffiti}</div> : null}
+            {data.signUp ? <div>{data.signUp}</div> : null}
+          </div>
+        </div>
       </div>
     </div>
   )

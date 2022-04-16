@@ -14,23 +14,37 @@ export default observer(({
   return (
     <div className={`tx-cell-outer ${ui.modeCssClass}`}>
       <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex' }}>
+          <div>Transaction <span style={{
+            fontWeight: '600',
+          }}>{hash.slice(0, 13)}</span></div>
+          <div style={{ margin: '0px 8px'}}>|</div>
+          <div>Events <span style={{ fontWeight: '600' }}>{events.length}</span></div>
+        </div>
         <div
-          className="header6"
           style={{ cursor: 'pointer' }}
           onClick={() => window.open(`https://${events[0].goerli ? 'goerli' : 'kovan-optimistic'}.etherscan.io/tx/${hash}`, '_blank')}
         >
-          {hash.slice(0, 15)}
-        </div>
-        <div>{events.length} event{events.length > 1 ? 's' : ''}</div>
+        Etherscan</div>
       </div>
-      {
-        events.map((event) => (
-          <>
-            <Spacer />
-            <EventCell event={event} />
-          </>
-        ))
-      }
+      <div
+        style={{
+          // divider
+          marginTop: '16px',
+          marginBottom: '26px',
+          width: 'calc(100% + 32px + 32px)',
+          height: '1px',
+          position: 'relative',
+          left: '-32px',
+          background: '#EAEEF0',
+        }}
+      />
+      {events.map((event, i) => (
+        <>
+          <EventCell event={event} index={i} />
+          {i < events.length - 1 ? <div style={{ height: '26px' }} /> : null}
+        </>
+      ))}
     </div>
   )
 })

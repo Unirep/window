@@ -1,8 +1,9 @@
 .tx-cell-outer {
   border-radius: 8px;
-  border: 1px solid var(--color-gray-4);
-  padding: 4px;
-  margin: 4px;
+  border: 8px solid var(--color-gray-1);
+  box-sizing: border-box;
+  padding: 32px;
+  margin: 16px 32px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
