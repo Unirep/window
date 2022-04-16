@@ -32,7 +32,7 @@ const proofEvents = eventNames.slice(4, 10)
 const socialEvents = eventNames.slice(10)
 
 const EventCheckbox = ({ name, visible, onChange }) => (
-  <div style={{ display: 'flex', alignItems: 'center', padding: '4px' }}>
+  <div style={{ display: 'flex', alignItems: 'center', padding: '4px', minWidth: '150px' }}>
     <Checkbox
       onChange={onChange}
       checked={visible}
