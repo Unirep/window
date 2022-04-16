@@ -233,10 +233,14 @@ export default observer(({
         </div>
       </div>
       <Spacer style={{ height: '26px' }} />
-      <div style={{ borderRadius: '4px', background: '#F0F2F2', padding: '16px' }}>
-        {descriptions[event.name]}
-      </div>
-      <Spacer />
+      {descriptions[event.name] && (
+        <>
+          <div style={{ borderRadius: '4px', background: '#F0F2F2', padding: '16px' }}>
+            {descriptions[event.name]}
+          </div>
+          <Spacer />
+        </>
+      )}
       <div style={{ display: 'flex', flex: '1', flexWrap: 'wrap', margin: '0px -4px' }}>
         <div className="gray-box">
           <div style={{ display: 'flex', flexDirection: 'column'}}>
