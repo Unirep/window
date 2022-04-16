@@ -19,7 +19,10 @@
   border-radius: 4px;
   background: #F0F2F2;
   flex: 1;
-  min-width: 100px;
-  margin: 0px 4px;
+  min-width: 250px;
+  margin: 4px;
   padding: 16px;
+  padding-bottom: 12px;
+  word-break: break-all;
+  flex-wrap: wrap;
 }

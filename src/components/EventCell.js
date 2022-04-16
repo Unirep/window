@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import './event-cell.css'
 import UIContext from 'nanoether/interface'
 import { ethers } from 'ethers'
+import splitCaps from '../utils/split-caps'
 
 const Spacer = (props) => <div style={{ width: '8px', height: '8px', ...(props.style ?? {}) }} />
 
@@ -229,7 +230,7 @@ export default observer(({
         </div>
         <Spacer />
         <div style={{ fontSize: '24px', fontWeight: '600', color: '#464748' }}>
-          {event.name}
+          {splitCaps(event.name)}
         </div>
       </div>
       <Spacer style={{ height: '26px' }} />

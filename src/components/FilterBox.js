@@ -2,6 +2,8 @@ import React from 'react'
 import './filter-box.css'
 import { observer } from 'mobx-react-lite'
 import Checkbox from 'nanoether/Checkbox'
+import splitCaps from '../utils/split-caps'
+
 const Spacer = () => <div style={{ width: '8px', height: '8px' }} />
 
 const eventNames = [
@@ -29,13 +31,13 @@ const operationEvents = eventNames.slice(0, 4)
 const proofEvents = eventNames.slice(4, 10)
 const socialEvents = eventNames.slice(10)
 
-const EventCheckbox = ({ name, visible }) => (
+const EventCheckbox = ({ name, visible, onChange }) => (
   <div style={{ display: 'flex', alignItems: 'center', padding: '4px' }}>
     <Checkbox
-      onChange={(enabled) => eventChanged(name, enabled)}
+      onChange={onChange}
       checked={visible}
     />
-    <div>{name}</div>
+    <div>{splitCaps(name)}</div>
     <Spacer />
   </div>
 )
@@ -98,17 +100,17 @@ export default observer(({ updateVisibleLogs }) => {
                 <Spacer />
               </div>
               <div className="filter-section-title">Operations</div>
-              {operationEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} />)}
+              {operationEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} onChange={(enabled) => eventChanged(n, enabled)} />)}
               <div style={{ flex: '1' }} />
             </div>
             <div className="filter-gray-box">
               <div className="filter-section-title">Proofs</div>
-              {proofEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} />)}
+              {proofEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} onChange={(enabled) => eventChanged(n, enabled)} />)}
               <div style={{ flex: '1' }} />
             </div>
             <div className="filter-gray-box">
               <div className="filter-section-title">Unirep Social Events</div>
-              {socialEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} />)}
+              {socialEvents.map((n) => <EventCheckbox name={n} visible={showingLogs[n]} onChange={(enabled) => eventChanged(n, enabled)} />)}
               <div style={{ flex: '1' }} />
             </div>
           </div>
