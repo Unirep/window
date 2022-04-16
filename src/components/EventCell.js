@@ -243,6 +243,8 @@ export default observer(({
             {data.eventType ? <div>Event Type</div> : null}
             {data.postContent ? <div>Post Content</div> : null}
             {data.postContent ? <div>{data.postContent}</div> : null}
+            {data.commentContent ? <div>Comment Content</div> : null}
+            {data.commentContent ? <div>{data.commentContent}</div> : null}
             {data.identity ? <div>Identity</div> : null}
             {data.identity ? <div style={{ wordBreak: 'break-all' }}>{data.identity}</div> : null}
           </div>
