@@ -257,7 +257,7 @@ export default observer(({
             {data.eventType ? <><div>{data.eventType}</div><Spacer /></> : null}
           </div>
         </div>
-        <div className="gray-box">
+        <div className="gray-box" style={{ minWidth: '240px' }}>
           <div style={{ display: 'flex', flexDirection: 'column'}}>
             {data.epoch ? <><div>Epoch</div><Spacer /></> : null}
             {data.epochKey ? <><div>Epoch Key</div><Spacer /></> : null}
